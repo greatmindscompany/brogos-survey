@@ -1,9 +1,26 @@
 import os
-import openai
 from typing import List, Dict
 
-# Ensure your OpenAI API key is set in environment
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# --- Securely load OpenAI key ---
+openai_key = None
+try:
+    import streamlit as st  # Only available in Streamlit Cloud
+    openai_key = st.secrets.get("OPENAI_API_KEY")
+except ModuleNotFoundError:
+    pass  # Running locally or in non‑Streamlit environment
+
+if not openai_key:
+    openai_key = os.getenv("OPENAI_API_KEY")
+
+if not openai_key:
+    raise RuntimeError(
+        "OPENAI_API_KEY not found. Set it in Streamlit Secrets "
+        "or as an environment variable."
+    )
+
+
+import openai
+openai.api_key = openai_key
 
 # Define your persona profiles
 personas = [
