@@ -30,8 +30,10 @@ openai.api_key = openai_key
 # Parse command-line arguments for custom slogans
 # ──────────────────────────────────────────────────────────────
 parser = argparse.ArgumentParser(description="Run BroGos survey with custom slogans.")
-parser.add_argument('--concept1', type=str, default=None, help='Custom slogan for concept 1 (Dad-Powered)')
-parser.add_argument('--concept2', type=str, default=None, help='Custom slogan for concept 2 (All Male)')
+parser.add_argument('--concept1', type=str, default=None,
+                    help='Custom slogan for concept 1 (Dad-Powered)')
+parser.add_argument('--concept2', type=str, default=None,
+                    help='Custom slogan for concept 2 (All Male)')
 args = parser.parse_args()
 
 # ──────────────────────
@@ -65,19 +67,19 @@ personas: List[Dict] = [
     {"name": "Rachel",    "age": 45, "profile": "Film critic, writes about 80s cinema and soundtracks."},
     {"name": "Monica",    "age": 54, "profile": "Travel blogger, captures 80s retro hotspots around the world."},
     # Younger (18-40) nostalgia fans
-    {"name": "Alex",     "age": 22, "profile": "College student, discovered 80s music through TikTok retro challenges."},
-    {"name": "Jordan",   "age": 28, "profile": "Junior graphic designer, loves VHS aesthetics and synthwave."},
-    {"name": "Taylor",   "age": 31, "profile": "Bartender by night, streams 80s playlists for shift vibes."},
-    {"name": "Morgan",   "age": 36, "profile": "Fitness influencer, uses 80s workout tracks in online classes."},
-    {"name": "Casey",    "age": 24, "profile": "Barista, hosts 80s trivia nights at local coffee shop."},
-    {"name": "Riley",    "age": 27, "profile": "Startup marketer, remixes 80s hits for social campaigns."},
-    {"name": "Avery",    "age": 34, "profile": "Graphic novelist, inspired by retro 80s comic art."},
-    {"name": "Bailey",   "age": 29, "profile": "UX researcher, listens to 80s soundtracks while prototyping."},
-    {"name": "Cameron",  "age": 37, "profile": "Software dev, codes to 80s synth-pop beats."},
-    {"name": "Drew",     "age": 26, "profile": "Social-media coordinator, curates 80s nostalgia posts."},
-    {"name": "Kai",      "age": 33, "profile": "Photographer, uses retro 80s filters in photo edits."},
-    {"name": "Sydney",   "age": 30, "profile": "Graphic designer, runs an 80s-inspired merch store."},
-    {"name": "Devin",    "age": 35, "profile": "Barista and part-time DJ, spins 80s classics on weekends."}
+    {"name": "Alex",      "age": 22, "profile": "College student, discovered 80s music through TikTok retro challenges."},
+    {"name": "Jordan",    "age": 28, "profile": "Junior graphic designer, loves VHS aesthetics and synthwave."},
+    {"name": "Taylor",    "age": 31, "profile": "Bartender by night, streams 80s playlists for shift vibes."},
+    {"name": "Morgan",    "age": 36, "profile": "Fitness influencer, uses 80s workout tracks in online classes."},
+    {"name": "Casey",     "age": 24, "profile": "Barista, hosts 80s trivia nights at local coffee shop."},
+    {"name": "Riley",     "age": 27, "profile": "Startup marketer, remixes 80s hits for social campaigns."},
+    {"name": "Avery",     "age": 34, "profile": "Graphic novelist, inspired by retro 80s comic art."},
+    {"name": "Bailey",    "age": 29, "profile": "UX researcher, listens to 80s soundtracks while prototyping."},
+    {"name": "Cameron",   "age": 37, "profile": "Software dev, codes to 80s synth-pop beats."},
+    {"name": "Drew",      "age": 26, "profile": "Social-media coordinator, curates 80s nostalgia posts."},
+    {"name": "Kai",       "age": 33, "profile": "Photographer, uses retro 80s filters in photo edits."},
+    {"name": "Sydney",    "age": 30, "profile": "Graphic designer, runs an 80s-inspired merch store."},
+    {"name": "Devin",     "age": 35, "profile": "Barista and part-time DJ, spins 80s classics on weekends."}
 ]
 
 # ──────────────────────
@@ -96,7 +98,7 @@ survey_questions = [
     {"key": "shareability",     "question": "On a scale of 1–5, how likely would you be to share a video or post about this concept on social media?"},
     {"key": "media_feature",    "question": "On a scale of 1–5, how likely is this concept to be featured on a talk show or morning news segment?"},
     {"key": "podcast_interest", "question": "On a scale of 1–5, how interested would you be in hearing a podcast or interview series about this band?"},
-    {"key": "persona_likeability","question": "On a scale of 1–5, how likable and relatable do you find the band’s personalities?"},
+    {"key": "persona_likeability", "question": "On a scale of 1–5, how likable and relatable do you find the band’s personalities?"},
     {"key": "merch_purchase",   "question": "On a scale of 1–5, how likely would you be to buy the band’s merchandise (shirts, mugs, etc.)?"},
     {"key": "sponsor_appeal",   "question": "On a scale of 1–5, how appealing is this concept for brand sponsorships or partnerships?"},
     {"key": "catchphrase",      "question": "On a scale of 1–5, how catchy is the band’s slogan or tagline?"},
@@ -114,35 +116,29 @@ default_concepts = {
     "all_male":   "All Male Tribute to the ’80s Ladies"
 }
 concepts = {
-    "dad_powered": args.concept1 if args.concept1 else default_concepts["dad_powered"],
-    "all_male":   args.concept2 if args.concept2 else default_concepts["all_male"]
+    "dad_powered": args.concept1 or default_concepts["dad_powered"],
+    "all_male":    args.concept2 or default_concepts["all_male"]
 }
 
 # ──────────────────────
 # OpenAI call per persona
 # ──────────────────────
 def run_survey_for_persona(persona: Dict) -> Dict:
-    system_prompt = (
-        f"You are {persona['name']}, age {persona['age']}. "
-        f"{persona['profile']}
-"
-        "Respond in JSON with keys for each concept ("dad_powered", "all_male"), each containing:
-"
-        "  - fun: integer 1-5
-"
-        "  - authenticity: integer 1-5
-"
-        "  - attendance: integer 1-5
-"
-        "  - comment: 1-2 sentence justification.
-"
-    )
-    user_prompt = "Please rate the following two band concepts:\n"
+    system_prompt = f\"\"\"You are {persona['name']}, age {persona['age']}. {persona['profile']}
+Respond in JSON with keys for each concept ("dad_powered", "all_male"), each containing:
+  - fun: integer 1-5
+  - authenticity: integer 1-5
+  - attendance: integer 1-5
+  - comment: 1-2 sentence justification.
+\"\"\"
+
+    user_prompt = "Please rate the following two band concepts:\\n"
     for key, desc in concepts.items():
-        user_prompt += f"\n[{desc}]\n"
+        user_prompt += f"\\n[{desc}]\\n"
         for q in survey_questions:
-            user_prompt += f"{q['question']}\n"
-    user_prompt += "\nRespond only with valid JSON."
+            user_prompt += f"{q['question']}\\n"
+    user_prompt += "\\nRespond only with valid JSON."
+
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -157,7 +153,7 @@ def run_survey_for_persona(persona: Dict) -> Dict:
 # Run full survey
 # ──────────────────────
 def run_full_survey(personas: List[Dict]) -> List[Dict]:
-    results = []  
+    results = []
     for p in personas:
         try:
             ratings = run_survey_for_persona(p)
