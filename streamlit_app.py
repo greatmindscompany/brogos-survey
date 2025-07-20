@@ -1,14 +1,3 @@
-`KeyError: 'concept'` means the DataFrame you built has **no `concept` column** (your JSON rows look like
-`{"persona": "...", "ratings": {"dad_powered": {...}, "all_male": {...}}}`).
-
-Below is a **drop-in replacement** for **your entire `streamlit_app.py`** that:
-
-* Imports `sys` (fixes the previous `NameError`).
-* Launches `survey_agents.py` with the correct interpreter.
-* Flattens the nested JSON into rows with a real **`concept`** column, so `df.groupby("concept")` works.
-* Shows errors in the UI if the subprocess crashes.
-
-```python
 import sys
 import subprocess
 import textwrap
