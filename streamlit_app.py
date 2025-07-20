@@ -12,15 +12,15 @@ st.title("🎸 BroGos Concept Survey Dashboard")
 if st.button("Run fresh survey (GPT)"):
     with st.spinner("Running survey agents…"):
         try:
-            result = subprocess.run(
-                ["python", "survey_agents.py"],
+            subprocess.run(
+                [sys.executable, "survey_agents.py"],   # ← use current venv's Python
                 check=True,
                 capture_output=True,
                 text=True
             )
             st.success("✅ Survey completed!")
         except subprocess.CalledProcessError as e:
-            st.error("🚫 Survey script crashed. Full traceback below:")
+            st.error("🚫 Survey failed. Traceback below:")
             st.code(textwrap.shorten(e.stderr or e.stdout, width=6000))
 
 
