@@ -5,10 +5,24 @@ st.set_page_config(page_title="BroGos Survey Dashboard", layout="wide")
 st.title("🎸 BroGos Concept Survey Dashboard")
 
 # Button to run survey script
+import subprocess, textwrap, streamlit as st
+
+st.title("🎸 BroGos Concept Survey Dashboard")
+
 if st.button("Run fresh survey (GPT)"):
-    with st.spinner("Running survey agents… this may take a few minutes ⏳"):
-        subprocess.run(["python", "survey_agents.py"], check=True)
-    st.success("Survey completed and results saved!")
+    with st.spinner("Running survey agents…"):
+        try:
+            result = subprocess.run(
+                ["python", "survey_agents.py"],
+                check=True,
+                capture_output=True,
+                text=True
+            )
+            st.success("✅ Survey completed!")
+        except subprocess.CalledProcessError as e:
+            st.error("🚫 Survey script crashed. Full traceback below:")
+            st.code(textwrap.shorten(e.stderr or e.stdout, width=6000))
+
 
 # Load results
 if os.path.exists("survey_output.json"):
