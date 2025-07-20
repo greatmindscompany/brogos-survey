@@ -1,4 +1,4 @@
-import json, os, subprocess, streamlit as st, pandas as pd
+import sys, json, os, subprocess, streamlit as st, pandas as pd
 
 st.set_page_config(page_title="BroGos Survey Dashboard", layout="wide")
 
