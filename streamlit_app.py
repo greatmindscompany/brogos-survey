@@ -9,16 +9,24 @@ import streamlit as st
 st.set_page_config(page_title="BroGos Survey Dashboard", layout="wide")
 st.title("🎸 BroGos Concept Survey Dashboard")
 
+# Input: custom slogans
+slogan1 = st.text_input("Concept A Slogan", placeholder="Dad-Powered ’80s Ladies Tribute Band")
+slogan2 = st.text_input("Concept B Slogan", placeholder="All Male Tribute to the ’80s Ladies")
+
 # ──────────────────────────
 # Helper: run the survey script
 # ──────────────────────────
-def run_survey_script():
+def run_survey_script(concept1: str, concept2: str):
     """
     Launch survey_agents.py with the SAME python interpreter
     the Streamlit app is using (so all packages are available).
     """
-    return subprocess.run(
-        [sys.executable, "survey_agents.py"],
+    cmd = [sys.executable, "survey_agents.py"]
+    if concept1:
+        cmd += ["--concept1", concept1]
+    if concept2:
+        cmd += ["--concept2", concept2]
+    return subprocess.run(cmd,
         check=True,
         capture_output=True,
         text=True
