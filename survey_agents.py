@@ -1,5 +1,7 @@
 import os
 import json
+import sys
+import argparse
 from typing import List, Dict
 
 # ──────────────────────────────────────────────────────────────
@@ -22,16 +24,15 @@ if not openai_key:
     )
 
 import openai
-import argparse
+openai.api_key = openai_key
 
+# ──────────────────────────────────────────────────────────────
 # Parse command-line arguments for custom slogans
+# ──────────────────────────────────────────────────────────────
 parser = argparse.ArgumentParser(description="Run BroGos survey with custom slogans.")
 parser.add_argument('--concept1', type=str, default=None, help='Custom slogan for concept 1 (Dad-Powered)')
 parser.add_argument('--concept2', type=str, default=None, help='Custom slogan for concept 2 (All Male)')
 args = parser.parse_args()
-
-import openai
-openai.api_key = openai_key
 
 # ──────────────────────
 # Persona profile list
@@ -105,60 +106,58 @@ survey_questions = [
     {"key": "ad_click_through", "question": "On a scale of 1–5, how likely are you to click on an online ad promoting this band?"}
 ]
 
-# Override default concepts with custom slogans if provided
+# ──────────────────────
+# Default and custom concepts
+# ──────────────────────
 default_concepts = {
-    'dad_powered': "Dad-Powered ’80s Ladies Tribute Band",
-    'all_male':   "All Male Tribute to the ’80s Ladies"
+    "dad_powered": "Dad-Powered ’80s Ladies Tribute Band",
+    "all_male":   "All Male Tribute to the ’80s Ladies"
 }
 concepts = {
-    'dad_powered': args.concept1 if args.concept1 else default_concepts['dad_powered'],
-    'all_male':   args.concept2 if args.concept2 else default_concepts['all_male']
-}
+    "dad_powered": args.concept1 if args.concept1 else default_concepts["dad_powered"],
+    "all_male":   args.concept2 if args.concept2 else default_concepts["all_male"]
 }
 
 # ──────────────────────
 # OpenAI call per persona
 # ──────────────────────
 def run_survey_for_persona(persona: Dict) -> Dict:
-    """
-    Ask GPT to rate both concepts for this persona.
-    Returns a dict with keys 'dad_powered' and 'all_male'.
-    """
     system_prompt = (
         f"You are {persona['name']}, age {persona['age']}. "
-        f"{persona['profile']}\n"
-        "Respond in JSON with keys for each concept "
-        '("dad_powered", "all_male"), each containing:\n'
-        "  - fun: integer 1-5\n"
-        "  - authenticity: integer 1-5\n"
-        "  - attendance: integer 1-5\n"
-        "  - comment: 1-2 sentence justification.\n"
+        f"{persona['profile']}
+"
+        "Respond in JSON with keys for each concept ("dad_powered", "all_male"), each containing:
+"
+        "  - fun: integer 1-5
+"
+        "  - authenticity: integer 1-5
+"
+        "  - attendance: integer 1-5
+"
+        "  - comment: 1-2 sentence justification.
+"
     )
-
     user_prompt = "Please rate the following two band concepts:\n"
     for key, desc in concepts.items():
         user_prompt += f"\n[{desc}]\n"
         for q in survey_questions:
             user_prompt += f"{q['question']}\n"
     user_prompt += "\nRespond only with valid JSON."
-
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  # switch if you prefer a different model
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": user_prompt}
         ],
         temperature=0.4
     )
-
-    # Assistant returns a JSON string; parse it
     return json.loads(response.choices[0].message["content"])
 
 # ──────────────────────
 # Run full survey
 # ──────────────────────
 def run_full_survey(personas: List[Dict]) -> List[Dict]:
-    results = []
+    results = []  
     for p in personas:
         try:
             ratings = run_survey_for_persona(p)
