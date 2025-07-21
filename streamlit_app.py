@@ -79,9 +79,9 @@ if os.path.exists("survey_output.json"):
         persona = rec.get("persona")
         ratings_block = rec.get("ratings", {})
         concept_order = rec.get("concept_order")
-        if not concept_order:
-            st.warning(f"⚠️ Warning: concept_order missing for persona {persona}. Fallback order used.")
-            concept_order = list(concept_labels.keys())
+    if not concept_order:
+        st.warning(f"⚠️ Warning: concept_order missing for persona {persona}. Fallback order used.")
+        concept_order = list(concept_labels.keys())
         for concept_key in concept_order:
             ratings = ratings_block.get(concept_key, {})
             label = concept_labels.get(concept_key, concept_key)
