@@ -78,9 +78,11 @@ if os.path.exists("survey_output.json"):
     for rec in raw:
         persona = rec.get("persona")
         ratings_block = rec.get("ratings", {})
-        for concept_key, ratings in ratings_block.items():
-            if concept_key in concept_labels:
-                row = {"persona": persona, "concept": concept_labels[concept_key]}
+        concept_order = rec.get("concept_order", list(concept_labels.keys()))
+        for concept_key in concept_order:
+            ratings = ratings_block.get(concept_key, {})
+            label = concept_labels.get(concept_key, concept_key)
+            row = {"persona": persona, "concept": label}
                 for key in metrics_keys:
                     row[key] = ratings.get(key)
                 rows.append(row)

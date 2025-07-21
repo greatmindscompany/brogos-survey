@@ -141,7 +141,10 @@ def run_survey_for_persona(persona: Dict) -> Dict:
         temperature=0.0
     )
 
-    return json.loads(response.choices[0].message["content"].strip())
+    return {
+    "ratings": json.loads(response.choices[0].message["content"].strip()),
+    "concept_order": [key for key, _ in concept_items]
+}
 # ──────────────────────
 # Run full survey
 # ──────────────────────
@@ -150,7 +153,11 @@ def run_full_survey(personas: List[Dict]) -> List[Dict]:
     for p in personas:
         try:
             ratings = run_survey_for_persona(p)
-            results.append({"persona": p["name"], "ratings": ratings})
+            results.append({
+    "persona": p["name"],
+    "ratings": ratings["ratings"],
+    "concept_order": ratings["concept_order"]
+})
         except Exception as e:
             results.append({"persona": p["name"], "error": str(e)})
     return results
