@@ -81,7 +81,9 @@ label_map = {
     "concept1": final_slogan1,
     "concept2": final_slogan2
 }
-df["concept_label"] = df["concept"].map(label_map)
+    df = pd.DataFrame(rows)
+    df["concept_label"] = df["concept"].map(label_map)
+
     if df.empty:
         st.warning("survey_output.json loaded, but no rows were parsed. Check JSON structure.")
     else:
