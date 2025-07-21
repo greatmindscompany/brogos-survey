@@ -121,12 +121,17 @@ def run_survey_for_persona(persona: Dict) -> Dict:
     concept_items = list(concepts.items())
     random.shuffle(concept_items)
 
+    concept_explanations = {
+        custom1 or slogan1: "This is an all-female band inspired by 80s music.",
+        custom2 or slogan2: "This is an all-male band performing 80s ladies' hits."
+    }
+
     user_prompt = (
         "You will evaluate each entertainment concept independently. "
         "Please rate each on its own merit:\n"
     )
     for key, desc in concept_items:
-        user_prompt += f"\nConcept: {desc}\n"
+        user_prompt += f"\nConcept: {desc}\n{concept_explanations.get(desc, "")}\n"
         for metric in metric_keys:
             q_text = metric.replace('_', ' ')
             user_prompt += f"On a scale of 1–5, how would you rate {q_text} for this concept?\n"
