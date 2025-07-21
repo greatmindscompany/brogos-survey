@@ -18,9 +18,6 @@ if not openai_key:
 import openai
 openai.api_key = openai_key
 
-# ──────────────────────
-# Default and final slogans
-# ──────────────────────
 DEFAULT_SLOGAN_1 = "Dad-Powered ’80s Ladies Tribute Band"
 DEFAULT_SLOGAN_2 = "All Male Tribute to the ’80s Ladies"
 
@@ -35,11 +32,7 @@ concepts = {
     "concept2": final_slogan2
 }
 
-# ──────────────────────
-# Persona profiles
-# ──────────────────────
 personas: List[Dict] = [
-
     {"name": "Sarah", "age": 48, "profile": "Working mom who grew up on MTV, loves nostalgic 80s pop and light humor."},
     {"name": "Linda", "age": 52, "profile": "Empty-nester, big on 80’s fashion and concert experiences."},
     {"name": "Tina", "age": 45, "profile": "Single professional, nostalgic but busy, prefers straightforward fun."},
@@ -92,8 +85,8 @@ metric_keys = [
 ]
 
 concepts = {
-    "dad_powered": slogan1,
-    "all_male": slogan2
+    "concept1": final_slogan1,
+    "concept2": final_slogan2
 }
 
 # ──────────────────────
