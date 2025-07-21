@@ -1,5 +1,6 @@
 import os
 import json
+import random
 from typing import List, Dict
 
 # ──────────────────────────────────────────────────────────────
@@ -110,12 +111,19 @@ def run_survey_for_persona(persona: Dict) -> Dict:
         "  - comment: 1-2 sentence justification."
     )
 
-    user_prompt = "Please rate the following two band concepts:\n"
-    for desc in concepts.values():
-        user_prompt += f"\n[{desc}]\n"
-        for key in metric_keys:
-            q_text = key.replace('_', ' ')
-            user_prompt += f"On a scale of 1–5, how would you rate {q_text}?\n"
+    # Randomize concept order to reduce anchoring bias
+    concept_items = list(concepts.items())
+    random.shuffle(concept_items)
+
+    user_prompt = (
+        "You will evaluate two entertainment concepts independently. "
+        "Please rate each on its own merit across the following attributes:\n"
+    )
+    for key, desc in concept_items:
+        user_prompt += f"\nConcept: {desc}\n"
+        for metric in metric_keys:
+            q_text = metric.replace('_', ' ')
+            user_prompt += f"On a scale of 1–5, how would you rate {q_text} for this concept?\n"
     user_prompt += "\nRespond only with valid JSON."
 
     response = openai.ChatCompletion.create(
