@@ -26,27 +26,15 @@ openai.api_key = openai_key
 # ──────────────────────
 # Customizable slogans via environment variables
 # ──────────────────────
+
 def _get_env_slogan(env_key: str, default: str) -> str:
     return os.getenv(env_key, default)
 
 DEFAULT_SLOGAN_1 = "Dad-Powered ’80s Ladies Tribute Band"
 DEFAULT_SLOGAN_2 = "All Male Tribute to the ’80s Ladies"
 
-custom1 = os.getenv("PHRASE_CUSTOM1")
-custom2 = os.getenv("PHRASE_CUSTOM2")
-
-if custom1 and custom2:
-    concepts = {
-        "custom1": custom1.strip(),
-        "custom2": custom2.strip()
-    }
-else:
-    slogan1 = _get_env_slogan("PHRASE_DAD_POWERED", DEFAULT_SLOGAN_1)
-    slogan2 = _get_env_slogan("PHRASE_ALL_MALE", DEFAULT_SLOGAN_2)
-    concepts = {
-        "dad_powered": slogan1,
-        "all_male": slogan2
-    }
+slogan1 = _get_env_slogan("PHRASE_DAD_POWERED", DEFAULT_SLOGAN_1)
+slogan2 = _get_env_slogan("PHRASE_ALL_MALE", DEFAULT_SLOGAN_2)
 
 # ──────────────────────
 # Persona profiles
@@ -102,6 +90,12 @@ metric_keys = [
     "sponsor_appeal", "catchphrase", "brand_recall",
     "market_viability", "guitar_shredding", "ad_click_through"
 ]
+
+concepts = {
+    "dad_powered": slogan1,
+    "all_male": slogan2
+}
+
 # ──────────────────────
 # GPT call for one persona
 # ──────────────────────
@@ -112,7 +106,7 @@ def run_survey_for_persona(persona: Dict) -> Dict:
         f"You are {persona['name']}, age {persona['age']}. "
         f"{persona['profile']}\n"
         "Respond in JSON with keys for each concept "
-        f"({', '.join([repr(k) for k in concepts.keys()])}), each containing:\n"
+        "(\"dad_powered\", \"all_male\"), each containing:\n"
         f"{schema_lines}\n"
         "  - comment: 1-2 sentence justification."
     )
@@ -122,8 +116,8 @@ def run_survey_for_persona(persona: Dict) -> Dict:
     random.shuffle(concept_items)
 
     user_prompt = (
-        "You will evaluate each entertainment concept independently. "
-        "Please rate each on its own merit:\n"
+        "You will evaluate two entertainment concepts independently. "
+        "Please rate each on its own merit across the following attributes:\n"
     )
     for key, desc in concept_items:
         user_prompt += f"\nConcept: {desc}\n"
@@ -142,6 +136,7 @@ def run_survey_for_persona(persona: Dict) -> Dict:
     )
 
     return json.loads(response.choices[0].message["content"].strip())
+
 # ──────────────────────
 # Run full survey
 # ──────────────────────

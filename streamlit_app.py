@@ -12,31 +12,23 @@ st.title("🎸 BroGos Concept Survey Dashboard")
 # ──────────────────────────
 # User inputs for custom slogans
 # ──────────────────────────
-DEFAULT1 = "Dad-Powered ’80s Ladies Tribute Band"
-DEFAULT2 = "All Male Tribute to the ’80s Ladies"
-
-slogan1 = st.text_input("Phrase for 'dad_powered' concept:", value=DEFAULT1)
-slogan2 = st.text_input("Phrase for 'all_male' concept:", value=DEFAULT2)
-
-custom_input_detected = slogan1.strip() != DEFAULT1 or slogan2.strip() != DEFAULT2
-active_concepts = {
-    "custom1": slogan1.strip(),
-    "custom2": slogan2.strip()
-} if custom_input_detected else {
-    "dad_powered": DEFAULT1,
-    "all_male": DEFAULT2
-}
+slogan1 = st.text_input(
+    "Phrase for 'dad_powered' concept:",
+    value="Dad-Powered ’80s Ladies Tribute Band"
+)
+slogan2 = st.text_input(
+    "Phrase for 'all_male' concept:",
+    value="All Male Tribute to the ’80s Ladies"
+)
 
 # ──────────────────────────
 # Helper: run the survey script with env overrides
 # ──────────────────────────
 def run_survey_script(s1: str, s2: str):
     env = os.environ.copy()
-    if custom_input_detected:
-        env["PHRASE_CUSTOM1"] = s1
-        env["PHRASE_CUSTOM2"] = s2
-    else:
+    if s1:
         env["PHRASE_DAD_POWERED"] = s1
+    if s2:
         env["PHRASE_ALL_MALE"] = s2
     return subprocess.run(
         [sys.executable, "survey_agents.py"],
@@ -78,11 +70,10 @@ if os.path.exists("survey_output.json"):
         persona = rec.get("persona")
         ratings_block = rec.get("ratings", {})
         for concept, ratings in ratings_block.items():
-            if concept in active_concepts:
-                row = {"persona": persona, "concept": concept}
-                for key in metrics_keys:
-                    row[key] = ratings.get(key)
-                rows.append(row)
+            row = {"persona": persona, "concept": concept}
+            for key in metrics_keys:
+                row[key] = ratings.get(key)
+            rows.append(row)
 
     df = pd.DataFrame(rows)
     if df.empty:
