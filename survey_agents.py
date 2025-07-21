@@ -19,26 +19,16 @@ if not openai_key:
         "OPENAI_API_KEY not found. Set it in Streamlit Secrets or as an env var."
     )
 
+# We are pinned to openai==0.28.1 in requirements.txt
 import openai
 openai.api_key = openai_key
-
-# ──────────────────────
-# Customizable slogans via environment variables
-# ──────────────────────
-
-def _get_env_slogan(env_key: str, default: str) -> str:
-    return os.getenv(env_key, default)
-
-DEFAULT_SLOGAN_1 = "Dad-Powered ’80s Ladies Tribute Band"
-DEFAULT_SLOGAN_2 = "All Male Tribute to the ’80s Ladies"
-
-slogan1 = _get_env_slogan("PHRASE_DAD_POWERED", DEFAULT_SLOGAN_1)
-slogan2 = _get_env_slogan("PHRASE_ALL_MALE", DEFAULT_SLOGAN_2)
 
 # ──────────────────────
 # Persona profiles
 # ──────────────────────
 personas: List[Dict] = [
+    # (same long persona list you provided) …
+    #  ────────────────────────────────────
     {"name": "Sarah", "age": 48, "profile": "Working mom who grew up on MTV, loves nostalgic 80s pop and light humor."},
     {"name": "Linda", "age": 52, "profile": "Empty-nester, big on 80’s fashion and concert experiences."},
     {"name": "Tina", "age": 45, "profile": "Single professional, nostalgic but busy, prefers straightforward fun."},
@@ -56,6 +46,7 @@ personas: List[Dict] = [
     {"name": "Rebecca", "age": 49, "profile": "Event planner, specializes in throwback 80s parties."},
     {"name": "Amanda", "age": 43, "profile": "Marketing manager, DJ for 80s nights on the weekends."},
     {"name": "Jennifer", "age": 48, "profile": "Photographer, nostalgic about 80s fashion shoots."},
+    {"name": "Melissa", "age": 50, "profile": "Yoga instructor, fond of 80s synth-pop during classes."},
     {"name": "Stephanie", "age": 42, "profile": "Software engineer, grew up coding to 80s soundtracks."},
     {"name": "Kimberly", "age": 46, "profile": "Financial analyst, weekend vinyl DJ for 80s funk."},
     {"name": "Deborah", "age": 44, "profile": "Podcast host, runs a show on 80s culture and music."},
@@ -63,6 +54,7 @@ personas: List[Dict] = [
     {"name": "Heather", "age": 51, "profile": "Fitness trainer, choreographs 80s-themed workout routines."},
     {"name": "Rachel", "age": 45, "profile": "Film critic, writes about 80s cinema and soundtracks."},
     {"name": "Monica", "age": 54, "profile": "Travel blogger, captures 80s retro hotspots around the world."},
+    # Younger nostalgia fans
     {"name": "Alex", "age": 22, "profile": "College student, discovered 80s music through TikTok retro challenges."},
     {"name": "Jordan", "age": 28, "profile": "Junior graphic designer, loves VHS aesthetics and synthwave."},
     {"name": "Taylor", "age": 31, "profile": "Bartender by night, streams 80s playlists for shift vibes."},
@@ -87,29 +79,31 @@ metric_keys = [
     "recommend", "value", "shareability", "media_feature",
     "podcast_interest", "persona_likeability", "merch_purchase",
     "sponsor_appeal", "catchphrase", "brand_recall",
-    "market_viability", "has_penis", "ad_click_through"
+    "market_viability", "brand_extension", "ad_click_through"
 ]
 
 concepts = {
-    "dad_powered": slogan1,
-    "all_male": slogan2
+    "dad_powered": "Dad-Powered ’80s Ladies Tribute Band",
+    "all_male": "All Male Tribute to the ’80s Ladies"
 }
 
 # ──────────────────────
 # GPT call for one persona
 # ──────────────────────
 def run_survey_for_persona(persona: Dict) -> Dict:
+    # Build schema block dynamically
     schema_lines = "\n".join([f"  - {k}: integer 1-5" for k in metric_keys])
 
     system_prompt = (
         f"You are {persona['name']}, age {persona['age']}. "
         f"{persona['profile']}\n"
         "Respond in JSON with keys for each concept "
-        "(\"dad_powered\", \"all_male\"), each containing:\n"
+        '("dad_powered", "all_male"), each containing:\n'
         f"{schema_lines}\n"
         "  - comment: 1-2 sentence justification."
     )
 
+    # Build user prompt with each metric question
     user_prompt = "Please rate the following two band concepts:\n"
     for desc in concepts.values():
         user_prompt += f"\n[{desc}]\n"
@@ -119,12 +113,12 @@ def run_survey_for_persona(persona: Dict) -> Dict:
     user_prompt += "\nRespond only with valid JSON."
 
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo",  # keep consistent with requirements.txt pin
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        temperature=0.0
+        temperature=0.0  # deterministic for clean JSON
     )
 
     return json.loads(response.choices[0].message["content"].strip())
