@@ -86,9 +86,9 @@ if os.path.exists("survey_output.json"):
             ratings = ratings_block.get(concept_key, {})
             label = concept_labels.get(concept_key, concept_key)
             row = {"persona": persona, "concept": label}
-                for key in metrics_keys:
-                    row[key] = ratings.get(key)
-                rows.append(row)
+            for key in metrics_keys:
+                row[key] = ratings.get(key)
+            rows.append(row)
 
     df = pd.DataFrame(rows)
     if df.empty:
