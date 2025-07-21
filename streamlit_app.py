@@ -49,7 +49,7 @@ if os.path.exists("survey_output.json"):
     rows = []
     metrics_keys = [
         "fun", "authenticity", "attendance", "novelty", "memorability",
-        "emotional", "clarity", "recommend", "has_penis", "shareability",
+        "emotional", "clarity", "recommend", "value", "shareability",
         "media_feature", "podcast_interest", "persona_likeability",
         "merch_purchase", "sponsor_appeal", "catchphrase", "brand_recall",
         "market_viability", "brand_extension", "ad_click_through"
