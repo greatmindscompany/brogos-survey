@@ -16,7 +16,7 @@ s1_input = st.text_input("Concept 1 Phrase (defaults to 'Dad-Powered…')", valu
 s2_input = st.text_input("Concept 2 Phrase (defaults to 'All Male…')", value="")
 
 # ──────────────────────────
-# Helper: run the survey script with env overrides
+# Define fallback logic
 # ──────────────────────────
 DEFAULT_SLOGAN_1 = "Dad-Powered ’80s Ladies Tribute Band"
 DEFAULT_SLOGAN_2 = "All Male Tribute to the ’80s Ladies"
@@ -24,12 +24,13 @@ DEFAULT_SLOGAN_2 = "All Male Tribute to the ’80s Ladies"
 final_slogan1 = s1_input.strip() or DEFAULT_SLOGAN_1
 final_slogan2 = s2_input.strip() or DEFAULT_SLOGAN_2
 
+# ──────────────────────────
+# Helper: run the survey script with env overrides
+# ──────────────────────────
 def run_survey_script(s1: str, s2: str):
     env = os.environ.copy()
-    if s1:
-        env["PHRASE_DAD_POWERED"] = s1
-    if s2:
-        env["PHRASE_ALL_MALE"] = s2
+    env["PHRASE_DAD_POWERED"] = s1
+    env["PHRASE_ALL_MALE"] = s2
     return subprocess.run(
         [sys.executable, "survey_agents.py"],
         check=True,
@@ -44,14 +45,14 @@ def run_survey_script(s1: str, s2: str):
 if st.button("🔄 Run fresh survey (GPT)"):
     with st.spinner("Running survey agents… this may take a few minutes ⏳"):
         try:
-            result = run_survey_script(slogan1, slogan2)
+            result = run_survey_script(final_slogan1, final_slogan2)
             st.success("✅ Survey completed!")
         except subprocess.CalledProcessError as e:
             st.error("🚫 Survey script crashed. Traceback below:")
             st.code(textwrap.shorten(e.stderr or e.stdout, width=6000))
 
 # ──────────────────────────
-# Load survey_output.json if present
+# Load and process survey output
 # ──────────────────────────
 if os.path.exists("survey_output.json"):
     with open("survey_output.json") as f:
@@ -77,11 +78,10 @@ if os.path.exists("survey_output.json"):
 
     df = pd.DataFrame(rows)
 
-label_map = {
-    "concept1": final_slogan1,
-    "concept2": final_slogan2
-}
-    df = pd.DataFrame(rows)
+    label_map = {
+        "concept1": final_slogan1,
+        "concept2": final_slogan2
+    }
     df["concept_label"] = df["concept"].map(label_map)
 
     if df.empty:
