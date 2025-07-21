@@ -60,10 +60,10 @@ if os.path.exists("survey_output.json"):
     rows = []
     metrics_keys = [
         "fun", "authenticity", "attendance", "novelty", "memorability",
-        "emotional", "clarity", "recommend", "value", "shareability",
+        "emotional", "clarity", "recommend", "has_penis", "shareability",
         "media_feature", "podcast_interest", "persona_likeability",
         "merch_purchase", "sponsor_appeal", "catchphrase", "brand_recall",
-        "market_viability", "brand_extension", "ad_click_through"
+        "market_viability", "guitar_shredding", "ad_click_through"
     ]
 
     for rec in raw:
