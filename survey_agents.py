@@ -3,8 +3,11 @@ import json
 import random
 from typing import List, Dict
 
+# ──────────────────────────────────────────────────────────────
+# Securely load OpenAI key (Streamlit Cloud or local)
+# ──────────────────────────────────────────────────────────────
 try:
-    import streamlit as st
+    import streamlit as st  # Present when running inside Streamlit Cloud
     openai_key = st.secrets.get("OPENAI_API_KEY")
 except ModuleNotFoundError:
     openai_key = None
@@ -13,25 +16,29 @@ if not openai_key:
     openai_key = os.getenv("OPENAI_API_KEY")
 
 if not openai_key:
-    raise RuntimeError("OPENAI_API_KEY not found. Set it in Streamlit Secrets or as an env var.")
+    raise RuntimeError(
+        "OPENAI_API_KEY not found. Set it in Streamlit Secrets or as an env var."
+    )
 
 import openai
 openai.api_key = openai_key
 
+# ──────────────────────
+# Customizable slogans via environment variables
+# ──────────────────────
+
+def _get_env_slogan(env_key: str, default: str) -> str:
+    return os.getenv(env_key, default)
+
 DEFAULT_SLOGAN_1 = "Dad-Powered ’80s Ladies Tribute Band"
 DEFAULT_SLOGAN_2 = "All Male Tribute to the ’80s Ladies"
 
-user_slogan1 = os.getenv("PHRASE_DAD_POWERED", "").strip()
-user_slogan2 = os.getenv("PHRASE_ALL_MALE", "").strip()
+slogan1 = _get_env_slogan("PHRASE_DAD_POWERED", DEFAULT_SLOGAN_1)
+slogan2 = _get_env_slogan("PHRASE_ALL_MALE", DEFAULT_SLOGAN_2)
 
-final_slogan1 = user_slogan1 or DEFAULT_SLOGAN_1
-final_slogan2 = user_slogan2 or DEFAULT_SLOGAN_2
-
-concepts = {
-    "concept1": final_slogan1,
-    "concept2": final_slogan2
-}
-
+# ──────────────────────
+# Persona profiles
+# ──────────────────────
 personas: List[Dict] = [
     {"name": "Sarah", "age": 48, "profile": "Working mom who grew up on MTV, loves nostalgic 80s pop and light humor."},
     {"name": "Linda", "age": 52, "profile": "Empty-nester, big on 80’s fashion and concert experiences."},
@@ -85,8 +92,8 @@ metric_keys = [
 ]
 
 concepts = {
-    "concept1": final_slogan1,
-    "concept2": final_slogan2
+    "dad_powered": slogan1,
+    "all_male": slogan2
 }
 
 # ──────────────────────
