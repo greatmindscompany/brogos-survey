@@ -87,7 +87,7 @@ metric_keys = [
     "recommend", "value", "shareability", "media_feature",
     "podcast_interest", "persona_likeability", "merch_purchase",
     "sponsor_appeal", "catchphrase", "brand_recall",
-    "market_viability", "brand_extension", "ad_click_through"
+    "market_viability", "has_penis", "ad_click_through"
 ]
 
 concepts = {
