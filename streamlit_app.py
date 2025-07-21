@@ -5,8 +5,9 @@ import json
 import os
 import pandas as pd
 import streamlit as st
+import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="BroGos Survey Dashboard", layout="wide")
+st.set_page_config(page_title="BroGos Concept Survey Dashboard", layout="wide")
 st.title("🎸 BroGos Concept Survey Dashboard")
 
 # ──────────────────────────
@@ -19,7 +20,7 @@ slogan1 = st.text_input("Phrase for 'dad_powered' concept:", value=DEFAULT1)
 slogan2 = st.text_input("Phrase for 'all_male' concept:", value=DEFAULT2)
 
 custom_input_detected = slogan1.strip() != DEFAULT1 or slogan2.strip() != DEFAULT2
-active_concepts = {
+concept_labels = {
     "custom1": slogan1.strip(),
     "custom2": slogan2.strip()
 } if custom_input_detected else {
@@ -77,9 +78,9 @@ if os.path.exists("survey_output.json"):
     for rec in raw:
         persona = rec.get("persona")
         ratings_block = rec.get("ratings", {})
-        for concept, ratings in ratings_block.items():
-            if concept in active_concepts:
-                row = {"persona": persona, "concept": concept}
+        for concept_key, ratings in ratings_block.items():
+            if concept_key in concept_labels:
+                row = {"persona": persona, "concept": concept_labels[concept_key]}
                 for key in metrics_keys:
                     row[key] = ratings.get(key)
                 rows.append(row)
@@ -93,6 +94,14 @@ if os.path.exists("survey_output.json"):
 
         metric = st.selectbox("Choose metric for bar chart:", metrics_keys, index=0)
         st.subheader(f"Average **{metric}** by Concept")
-        st.bar_chart(df.groupby("concept")[metric].mean())
+
+        grouped = df.groupby("concept")[metric].mean()
+
+        fig, ax = plt.subplots()
+        grouped.plot(kind='bar', ax=ax)
+        ax.set_ylabel(f"Average {metric}")
+        ax.set_xlabel("Concept")
+        ax.set_xticklabels(grouped.index, rotation=0)  # <-- horizontal labels
+        st.pyplot(fig)
 else:
     st.info("No survey_output.json found. Click the button above to run the survey.")
